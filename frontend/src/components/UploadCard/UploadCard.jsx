@@ -3,7 +3,8 @@ import ImagePreview from '../ImagePreview/ImagePreview';
 import styles from './UploadCard.module.css';
 
 function UploadCard({ selectedFile, previewUrl, onFileSelect, onClear }) {
-  const inputRef = useRef(null);
+  const galleryInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragOver = useCallback((e) => {
@@ -35,19 +36,34 @@ function UploadCard({ selectedFile, previewUrl, onFileSelect, onClear }) {
     }
   };
 
-  const handleBrowse = () => {
-    inputRef.current?.click();
+  const openGallery = () => {
+    galleryInputRef.current?.click();
+  };
+
+  const openCamera = () => {
+    cameraInputRef.current?.click();
   };
 
   return (
     <div className={styles.card}>
       <input
-        ref={inputRef}
+        ref={galleryInputRef}
         type="file"
         accept="image/*"
         onChange={handleFileChange}
         className={styles.hiddenInput}
         aria-hidden="true"
+        tabIndex={-1}
+      />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileChange}
+        className={styles.hiddenInput}
+        aria-hidden="true"
+        tabIndex={-1}
       />
 
       {!previewUrl ? (
@@ -56,11 +72,7 @@ function UploadCard({ selectedFile, previewUrl, onFileSelect, onClear }) {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          role="button"
-          tabIndex={0}
-          onClick={handleBrowse}
-          onKeyDown={(e) => e.key === 'Enter' && handleBrowse()}
-          aria-label="Upload potato leaf image"
+          aria-label="Drag and drop potato leaf image"
         >
           <div className={styles.dropzoneIcon}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -70,19 +82,23 @@ function UploadCard({ selectedFile, previewUrl, onFileSelect, onClear }) {
             </svg>
           </div>
           <h3 className={styles.dropzoneTitle}>Drag & drop your image here</h3>
-          <p className={styles.dropzoneSubtitle}>
-            or click to browse from your device
-          </p>
-          <button
-            type="button"
-            className={styles.browseBtn}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleBrowse();
-            }}
-          >
-            Browse Files
-          </button>
+          <p className={styles.dropzoneSubtitle}>or choose an option below</p>
+          <div className={styles.actionButtons}>
+            <button
+              type="button"
+              className={styles.browseBtn}
+              onClick={openGallery}
+            >
+              📁 Choose from Gallery
+            </button>
+            <button
+              type="button"
+              className={styles.browseBtn}
+              onClick={openCamera}
+            >
+              📷 Take Photo
+            </button>
+          </div>
           <p className={styles.hint}>Supports JPG, PNG, WEBP — Max 10MB</p>
         </div>
       ) : (
